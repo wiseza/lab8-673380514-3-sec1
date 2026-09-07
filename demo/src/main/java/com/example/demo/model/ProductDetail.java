@@ -1,5 +1,6 @@
 package com.example.demo.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -18,6 +19,9 @@ public class ProductDetail {
     private Double weight;
     private String dimensions;
     private String manufacturedCountry;
+    
+    @Column(columnDefinition = "TEXT")
+    private String description;
 
     @OneToOne(mappedBy = "detail")
     private Product product;
@@ -25,13 +29,13 @@ public class ProductDetail {
     public ProductDetail() {
     }
 
-    public ProductDetail(Long id, String warranty, Double weight, String dimensions, String manufacturedCountry) {
+    public ProductDetail(Long id, String warranty, Double weight, String dimensions, String manufacturedCountry, String description) {
         this.id = id;
         this.warranty = warranty;
         this.weight = weight;
         this.dimensions = dimensions;
         this.manufacturedCountry = manufacturedCountry;
-        this.product = new Product();
+        this.description = description;
     }
 
     public Long getId() {
@@ -80,6 +84,14 @@ public class ProductDetail {
 
     public void setProduct(Product product) {
         this.product = product;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
 }

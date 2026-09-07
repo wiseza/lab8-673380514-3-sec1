@@ -12,6 +12,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 
 @Entity
 @Table(name = "products")
@@ -27,6 +28,9 @@ public class Product {
     private Double price;
     private String discountType;
 
+    @Transient
+    private Double discountedPrice;
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "detail_id", referencedColumnName = "id")
     private ProductDetail detail;
@@ -35,9 +39,10 @@ public class Product {
     private List<Review> reviews = new ArrayList<>();
 
     public Product() {
+        this.detail = new ProductDetail();
     }
 
-    public Product(Long id, String name, String category, String brand, Integer stock, Double price, String discountType) {
+    public Product(Long id, String name, String category, String brand, Integer stock, Double price, String discountType, Double discountedPrice) {
         this.id = id;
         this.name = name;
         this.category = category;
@@ -45,10 +50,9 @@ public class Product {
         this.stock = stock;
         this.price = price;
         this.discountType = discountType;
-        this.detail = new ProductDetail();
-        this.reviews = new ArrayList<>();
+        this.discountedPrice = discountedPrice;
     }
-    
+
     public Long getId() {
         return id;
     }
@@ -119,6 +123,14 @@ public class Product {
 
     public void setReviews(List<Review> reviews) {
         this.reviews = reviews;
+    }
+
+    public Double getDiscountedPrice() {
+        return discountedPrice;
+    }
+
+    public void setDiscountedPrice(Double discountedPrice) {
+        this.discountedPrice = discountedPrice;
     }
 
 }

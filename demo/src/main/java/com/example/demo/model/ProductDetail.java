@@ -25,6 +25,15 @@ public class ProductDetail {
     public ProductDetail() {
     }
 
+    public ProductDetail(Long id, String warranty, Double weight, String dimensions, String manufacturedCountry) {
+        this.id = id;
+        this.warranty = warranty;
+        this.weight = weight;
+        this.dimensions = dimensions;
+        this.manufacturedCountry = manufacturedCountry;
+        this.product = new Product();
+    }
+
     public Long getId() {
         return id;
     }

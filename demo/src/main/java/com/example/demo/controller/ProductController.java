@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.demo.model.Product;
+import com.example.demo.model.Review;
 import com.example.demo.service.ProductService;
 
 @Controller
@@ -25,8 +26,8 @@ public class ProductController {
     public String listProducts(Model model) {
 
         model.addAttribute(
-            "products",
-            productService.getAllProducts()
+                "products",
+                productService.getAllProducts()
         );
 
         return "products/list";
@@ -35,7 +36,10 @@ public class ProductController {
     @GetMapping("/add")
     public String showAddForm(Model model) {
 
-        model.addAttribute("product", new Product());
+        Product product = new Product();
+        product.getReviews().add(new Review());
+
+        model.addAttribute("product", product);
 
         return "products/add";
     }
@@ -72,11 +76,15 @@ public class ProductController {
     }
 
     @GetMapping("/delete/{id}")
-    public String deleteProduct(
-            @PathVariable Long id) {
+    public String showDeleteForm(@PathVariable Long id, Model model) {
+        Product product = productService.getProductById(id);
+        model.addAttribute("product", product);
+        return "products/delete";
+    }
 
+    @PostMapping("/delete/{id}")
+    public String deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
-
         return "redirect:/products";
     }
 }

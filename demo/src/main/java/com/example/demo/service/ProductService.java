@@ -6,7 +6,13 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.model.Product;
 import com.example.demo.model.ProductDetail;
+import com.example.demo.model.Review;
 import com.example.demo.repository.ProductRepository;
+import com.example.demo.strategy.DiscountContext;
+import com.example.demo.strategy.DiscountStrategy;
+import com.example.demo.strategy.MemberDiscountStrategy;
+import com.example.demo.strategy.NoDiscountStrategy;
+import com.example.demo.strategy.SeasonalSaleStrategy;
 
 @Service
 public class ProductService {
@@ -18,11 +24,40 @@ public class ProductService {
     }
 
     public List<Product> getAllProducts() {
-        return productRepository.findAll();
+
+        List<Product> products = productRepository.findAll();
+
+        for (Product product : products) {
+            product.setDiscountedPrice(
+                    calculateDiscountedPrice(product)
+            );
+        }
+
+        return products;
     }
 
     public Product getProductById(Long id) {
         return productRepository.findById(id).orElse(null);
+    }
+
+    private double calculateDiscountedPrice(Product product) {
+        DiscountStrategy strategy;
+        switch (product.getDiscountType()) {
+            case "MEMBER":
+                strategy = new MemberDiscountStrategy();
+                break;
+
+            case "SEASONAL":
+                strategy = new SeasonalSaleStrategy();
+                break;
+
+            case "NONE":
+            default:
+                strategy = new NoDiscountStrategy();
+                break;
+        }
+        DiscountContext context = new DiscountContext(strategy);
+        return context.calculatePrice(product.getPrice());
     }
 
     public void saveProduct(Product product) {
@@ -30,6 +65,16 @@ public class ProductService {
         if (product.getDetail() != null) {
             product.getDetail().setProduct(product);
         }
+
+        if (product.getReviews() != null) {
+            for (Review review : product.getReviews()) {
+                review.setProduct(product);
+            }
+        }
+
+        product.setDiscountedPrice(
+                calculateDiscountedPrice(product)
+        );
 
         productRepository.save(product);
     }
@@ -57,22 +102,26 @@ public class ProductService {
                     ProductDetail detail = existingProduct.getDetail();
 
                     detail.setWarranty(
-                        product.getDetail().getWarranty()
+                            product.getDetail().getWarranty()
                     );
 
                     detail.setWeight(
-                        product.getDetail().getWeight()
+                            product.getDetail().getWeight()
                     );
 
                     detail.setDimensions(
-                        product.getDetail().getDimensions()
+                            product.getDetail().getDimensions()
                     );
 
                     detail.setManufacturedCountry(
-                        product.getDetail().getManufacturedCountry()
+                            product.getDetail().getManufacturedCountry()
                     );
                 }
             }
+
+            existingProduct.setDiscountedPrice(
+                    calculateDiscountedPrice(existingProduct)
+            );
 
             productRepository.save(existingProduct);
         }

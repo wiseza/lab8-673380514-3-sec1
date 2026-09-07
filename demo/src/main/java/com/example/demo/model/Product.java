@@ -34,6 +34,21 @@ public class Product {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<Review> reviews = new ArrayList<>();
 
+    public Product() {
+    }
+
+    public Product(Long id, String name, String category, String brand, Integer stock, Double price, String discountType) {
+        this.id = id;
+        this.name = name;
+        this.category = category;
+        this.brand = brand;
+        this.stock = stock;
+        this.price = price;
+        this.discountType = discountType;
+        this.detail = new ProductDetail();
+        this.reviews = new ArrayList<>();
+    }
+    
     public Long getId() {
         return id;
     }
